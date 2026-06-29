@@ -10,21 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Setup EAS
-        run: npm install -g eas-cli
+      - name: Install Expo CLI
+        run: npm install -g expo@~51.0.28
 
-      - name: Build APK with EAS
-        run: eas build -p android --profile preview --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      - name: Prebuild Android
+        run: npx expo prebuild --platform android --clean --non-interactive
+
+      - name: Build Debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: UNIQUE-demo-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
