@@ -16,6 +16,12 @@
     ],
     "android": {
       "package": "com.unique.investmentdemo"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "cc8d73b0-3393-42d4-91dc-d43d637b8f23"
+      }
+    },
+    "owner": "rotemhaber34"
   }
 }
