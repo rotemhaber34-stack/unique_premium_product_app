@@ -23,16 +23,10 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
-      - name: Debug token exists
+      - name: Initialize EAS project if needed
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: |
-          if [ -z "$EXPO_TOKEN" ]; then
-            echo "EXPO_TOKEN is EMPTY"
-            exit 1
-          else
-            echo "EXPO_TOKEN exists"
-          fi
+        run: eas init --non-interactive || true
 
       - name: Build APK
         env:
