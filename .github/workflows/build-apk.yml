@@ -3,15 +3,14 @@ name: Build Android APK
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node
@@ -19,11 +18,26 @@ jobs:
         with:
           node-version: 20
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
       - name: Install dependencies
         run: npm install
 
-      - name: Setup Expo
-        run: npm install -g eas-cli
+      - name: Generate Android project
+        run: npx expo prebuild --platform android --non-interactive
 
-      - name: Build APK
-        run: eas build -p android --profile preview --local --non-interactive
+      - name: Make Gradle executable
+        run: chmod +x android/gradlew
+
+      - name: Build debug APK
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: UNIQUE-demo-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
